@@ -1,4 +1,5 @@
 # Farm Saathi
+## Use linux to run properly.
 
 Farm Saathi is an integrated smart farming solution designed to empower modern farmers with data-driven insights. By harnessing satellite imagery, intelligent layout design, and real‐time monitoring, Farm Saathi provides an end-to-end platform to optimize field management and boost productivity.
 
