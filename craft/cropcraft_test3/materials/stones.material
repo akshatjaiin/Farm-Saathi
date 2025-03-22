@@ -1,0 +1,17 @@
+material stones
+{
+  technique
+  {
+    pass
+    {
+      cull_hardware none
+      cull_software none
+
+      texture_unit
+      {
+        texture rock.jpg
+      }
+    }
+  }
+}
+

@@ -1,0 +1,65 @@
+{
+    "request": {
+        "headers": {
+            "accept": "image/tiff",
+            "content-type": "application/json"
+        },
+        "payload": {
+            "evalscript": "     //VERSION=3\n     function setup(){\n        return{\n          input: [\"CLP\"],\n          output: [\n            {\n              sampleType: \"FLOAT32\",\n              bands: 1\n            }\n        ]\n        }\n      }\n      \n      function evaluatePixel(sample){\n        return [sample.CLP/255];\n      }",
+            "input": {
+                "bounds": {
+                    "bbox": [
+                        75.756183,
+                        26.949292,
+                        75.807253,
+                        26.971287
+                    ],
+                    "properties": {
+                        "crs": "http://www.opengis.net/def/crs/EPSG/0/4326"
+                    }
+                },
+                "data": [
+                    {
+                        "dataFilter": {
+                            "timeRange": {
+                                "from": "2025-03-19T00:00:00Z",
+                                "to": "2025-03-19T23:59:59Z"
+                            }
+                        },
+                        "type": "sentinel-2-l1c"
+                    }
+                ]
+            },
+            "output": {
+                "height": 247,
+                "responses": [
+                    {
+                        "format": {
+                            "type": "image/tiff"
+                        },
+                        "identifier": "default"
+                    }
+                ],
+                "width": 505
+            }
+        },
+        "timestamp": "2025-03-21T15:00:24.305294",
+        "url": "https://services.sentinel-hub.com/api/v1/process"
+    },
+    "response": {
+        "elapsed": 3.969081,
+        "headers": {
+            "Connection": "keep-alive",
+            "Content-Type": "image/tiff",
+            "Date": "Fri, 21 Mar 2025 09:30:23 GMT",
+            "Transfer-Encoding": "chunked",
+            "access-control-allow-credentials": "true",
+            "access-control-allow-headers": "origin,content-type,accept,accept-crs,authorization,cache-control",
+            "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH",
+            "access-control-allow-origin": "*",
+            "access-control-max-age": "3600",
+            "x-processingunits-spent": "0.3172175184056414"
+        },
+        "status_code": 200
+    }
+}

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate CropCraft YAML - Farm Saathi</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h1 {
+            color: #2c6e49;
+            text-align: center;
+            font-size: 2em;
+        }
+        h2, h3 {
+            color: #4a8c63;
+            margin: 25px 0 15px;
+            font-size: 1.3em;
+            cursor: pointer;
+        }
+        h3:hover {
+            text-decoration: underline;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        label {
+            display: inline-block;
+            width: 250px;
+            margin: 10px 0 5px;
+            font-weight: 500;
+            position: relative;
+        }
+        label[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            left: 260px;
+            top: 0;
+            background: #333;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        input, select {
+            width: calc(100% - 270px);
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            border-color: #2c6e49;
+            outline: none;
+        }
+        input:invalid {
+            border-color: #d9534f;
+        }
+        .bed-section, .optional-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            background: #fafafa;
+            position: relative;
+        }
+        .optional-section {
+            display: none;
+        }
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #d9534f;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .remove-btn:hover {
+            background: #c9302c;
+        }
+        button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px;
+            background: #2c6e49;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #1f4e34;
+        }
+        #add-bed {
+            background: #4a8c63;
+            width: 150px;
+            margin: 10px 0;
+        }
+        #add-bed:hover {
+            background: #3a6e4f;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 0.95em;
+            white-space: pre-wrap;
+        }
+        a {
+            display: inline-block;
+            margin-top: 10px;
+            color: #2c6e49;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 600px) {
+            label {
+                width: 100%;
+            }
+            input, select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Create CropCraft YAML for Farm Saathi</h1>
+    <form method="POST" action="{% url 'dash/generate_yaml' %}" novalidate>
+        {% csrf_token %}
+        
+        <h3>Field Layout</h3>
+        <label for="headland_width" title="Extra ground around the field (meters)">Headland Width (m):</label>
+        <input type="number" name="headland_width" id="headland_width" min="0" max="20" step="0.1" value="8.0" required><br>
+        
+        <label for="bed_width" title="Width of each bed (meters)">Bed Width (m):</label>
+        <input type="number" name="bed_width" id="bed_width" min="0.1" max="5" step="0.01" value="1.57" required><br>
+        
+        <label for="plants_count" title="Total plants per bed">Plants per Bed:</label>
+        <input type="number" name="plants_count" id="plants_count" min="1" max="200" value="150" required><br>
+        
+        <label for="plant_distance" title="Distance between plants in a row (meters)">Plant Distance (m):</label>
+        <input type="number" name="plant_distance" id="plant_distance" min="0.01" max="5" step="0.01" value="0.14" required><br>
+
+        <h3>Bed Configurations</h3>
+        <div id="beds-container">
+            <div class="bed-section" data-bed-id="1">
+                <h4>Bed 1</h4>
+                <label for="plant_type_1" title="Crop type for this bed">Plant Type:</label>
+                <select name="plant_type_1" id="plant_type_1" required>
+                    <option value="" disabled selected>Select a plant</option>
+                    <option value="bean">Bean (0.05-0.217m)</option>
+                    <option value="maize">Maize (0.1-2m)</option>
+                    <option value="vine1">Vine 1 (0.5-1.5m)</option>
+                    <option value="vine2">Vine 2 (0.5-1.5m)</option>
+                    <option value="portulaca">Portulaca (0.05-0.15m)</option>
+                    <option value="taraxacum">Taraxacum (0.05-0.3m)</option>
+                    <option value="polygonum">Polygonum (0.05-0.3m)</option>
+                </select><br>
+                
+                <label for="plant_height_1" title="Height of plants in this bed (meters)">Plant Height (m):</label>
+                <input type="number" name="plant_height_1" id="plant_height_1" min="0.01" max="5" step="0.01" value="0.22" required><br>
+                
+                <label for="rows_count_1" title="Number of rows in this bed">Rows per Bed:</label>
+                <input type="number" name="rows_count_1" id="rows_count_1" min="1" max="5" value="2" required><br>
+                
+                <label for="row_distance_1" title="Distance between rows in this bed (meters)">Row Distance (m):</label>
+                <input type="number" name="row_distance_1" id="row_distance_1" min="0" max="5" step="0.01" value="0.785" required><br>
+                
+                <label for="beds_count_1" title="Number of instances of this bed">Bed Instances:</label>
+                <input type="number" name="beds_count_1" id="beds_count_1" min="1" max="10" value="2" required><br>
+            </div>
+        </div>
+        <button type="button" id="add-bed">Add Another Bed</button>
+
+        <h3 onclick="toggleSection('noise-section')">Noise Settings (Optional)</h3>
+        <div id="noise-section" class="optional-section">
+            <label for="noise_position" title="Position variation (meters)">Position (m):</label>
+            <input type="number" name="noise_position" id="noise_position" min="0" max="1" step="0.001" value="0.008"><br>
+            
+            <label for="noise_tilt" title="Tilt variation (radians)">Tilt (rad):</label>
+            <input type="number" name="noise_tilt" id="noise_tilt" min="0" max="1" step="0.01" value="0.05"><br>
+            
+            <label for="noise_scale" title="Scale variation (coefficient)">Scale:</label>
+            <input type="number" name="noise_scale" id="noise_scale" min="0" max="1" step="0.01" value="0.10"><br>
+            
+            <label for="noise_missing" title="Probability of missing plants (0-1)">Missing:</label>
+            <input type="number" name="noise_missing" id="noise_missing" min="0" max="1" step="0.01" value="0.15"><br>
+        </div>
+
+        <h3 onclick="toggleSection('stones-section')">Stones Settings (Optional)</h3>
+        <div id="stones-section" class="optional-section">
+            <label for="stones_density" title="Quantity of stones per area">Density:</label>
+            <input type="number" name="stones_density" id="stones_density" min="0" max="100" step="0.1" value="60.0"><br>
+            
+            <label for="stones_noise_scale" title="Roughness size of stone distribution">Noise Scale:</label>
+            <input type="number" name="stones_noise_scale" id="stones_noise_scale" min="0" max="1" step="0.01" value="0.24"><br>
+        </div>
+
+        <h3>Output</h3>
+        <label for="output_format" title="Format for the generated field">Generate for:</label>
+        <select name="output_format" id="output_format" required>
+            <option value="" disabled selected>Choose an output</option>
+            <option value="blender">Blender (.blend)</option>
+            <option value="gazebo">Gazebo (SDF)</option>
+            <option value="both">Both</option>
+        </select><br>
+
+        <button type="submit">Generate YAML</button>
+    </form>
+
+    {% if yaml_content %}
+        <h2>Generated YAML</h2>
+        <pre>{{ yaml_content }}</pre>
+        <a href="{% url 'download_yaml' %}">Download YAML</a>
+    {% endif %}
+
+    <script>
+        const plantRanges = {
+            "bean": { min: 0.05, max: 0.217, default: 0.15 },
+            "maize": { min: 0.1, max: 2, default: 0.22 },
+            "vine1": { min: 0.5, max: 1.5, default: 1 },
+            "vine2": { min: 0.5, max: 1.5, default: 1 },
+            "portulaca": { min: 0.05, max: 0.15, default: 0.1 },
+            "taraxacum": { min: 0.05, max: 0.3, default: 0.15 },
+            "polygonum": { min: 0.05, max: 0.3, default: 0.15 }
+        };
+
+        let bedCounter = 1;
+
+        document.getElementById("add-bed").addEventListener("click", function() {
+            bedCounter++;
+            const container = document.getElementById("beds-container");
+            const newBed = document.createElement("div");
+            newBed.className = "bed-section";
+            newBed.dataset.bedId = bedCounter;
+            newBed.innerHTML = `
+                <h4>Bed ${bedCounter} <button type="button" class="remove-btn">Remove</button></h4>
+                <label for="plant_type_${bedCounter}" title="Crop type for this bed">Plant Type:</label>
+                <select name="plant_type_${bedCounter}" id="plant_type_${bedCounter}" required>
+                    <option value="" disabled selected>Select a plant</option>
+                    <option value="bean">Bean (0.05-0.217m)</option>
+                    <option value="maize">Maize (0.1-2m)</option>
+                    <option value="vine1">Vine 1 (0.5-1.5m)</option>
+                    <option value="vine2">Vine 2 (0.5-1.5m)</option>
+                    <option value="portulaca">Portulaca (0.05-0.15m)</option>
+                    <option value="taraxacum">Taraxacum (0.05-0.3m)</option>
+                    <option value="polygonum">Polygonum (0.05-0.3m)</option>
+                </select><br>
+                <label for="plant_height_${bedCounter}" title="Height of plants in this bed (meters)">Plant Height (m):</label>
+                <input type="number" name="plant_height_${bedCounter}" id="plant_height_${bedCounter}" min="0.01" max="5" step="0.01" value="0.15" required><br>
+                <label for="rows_count_${bedCounter}" title="Number of rows in this bed">Rows per Bed:</label>
+                <input type="number" name="rows_count_${bedCounter}" id="rows_count_${bedCounter}" min="1" max="5" value="2" required><br>
+                <label for="row_distance_${bedCounter}" title="Distance between rows in this bed (meters)">Row Distance (m):</label>
+                <input type="number" name="row_distance_${bedCounter}" id="row_distance_${bedCounter}" min="0" max="5" step="0.01" value="0.5" required><br>
+                <label for="beds_count_${bedCounter}" title="Number of instances of this bed">Bed Instances:</label>
+                <input type="number" name="beds_count_${bedCounter}" id="beds_count_${bedCounter}" min="1" max="10" value="1" required><br>
+            `;
+            container.appendChild(newBed);
+
+            newBed.querySelector(".remove-btn").addEventListener("click", function() {
+                newBed.remove();
+            });
+
+            newBed.querySelector(`#plant_type_${bedCounter}`).addEventListener("change", function() {
+                const heightInput = newBed.querySelector(`#plant_height_${bedCounter}`);
+                const selected = this.value;
+                if (plantRanges[selected]) {
+                    const { min, max, default: defaultHeight } = plantRanges[selected];
+                    heightInput.value = defaultHeight;
+                    heightInput.min = min;
+                    heightInput.max = max;
+                }
+            });
+        });
+
+        document.getElementById("plant_type_1").addEventListener("change", function() {
+            const heightInput = document.getElementById("plant_height_1");
+            const selected = this.value;
+            if (plantRanges[selected]) {
+                const { min, max, default: defaultHeight } = plantRanges[selected];
+                heightInput.value = defaultHeight;
+                heightInput.min = min;
+                heightInput.max = max;
+            }
+        });
+
+        document.querySelectorAll("input, select").forEach(input => {
+            input.addEventListener("input", function() {
+                this.checkValidity() ? this.style.borderColor = "#ccc" : this.style.borderColor = "#d9534f";
+            });
+        });
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.style.display = section.style.display === "block" ? "none" : "block";
+        }
+    </script>
+</body>
+</html>

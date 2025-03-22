@@ -1,0 +1,12 @@
+{% extends 'dash/base.html' %}
+{% load static %}
+{% block id %}{{ userid }}{% endblock %}
+{% block title %}Chat-enabled Support{% endblock %}
+{% block content %}
+
+<div style="position: relative; width: 100%; height: 100vh;">
+  <iframe src="https://cdn.botpress.cloud/webchat/v2.2/shareable.html?configUrl=https://files.bpcontent.cloud/2025/03/20/18/20250320185312-3QDBZBZR.json" frameborder="0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,17 @@
+material taraxacum
+{
+  technique
+  {
+    pass
+    {
+      cull_hardware none
+      cull_software none
+
+      texture_unit
+      {
+        texture taraxacum.jpg
+      }
+    }
+  }
+}
+
