@@ -1,0 +1,13 @@
+/backend/node_modules
+/backend/src/.env
+.env
+/frontend/node_modules
+*.DS_Store
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
