@@ -1,0 +1,282 @@
+{% extends 'dash/base.html' %}
+{% load static %}
+{% block id %}{{ userid }}{% endblock %}
+{% block title %}Chat-enabled Support{% endblock %}
+{% block content %}
+
+<div style="position: relative; width: 100%; height: 100vh;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agriculture ChatBot</title>
+
+    <style>
+
+        .chat-container {
+            width: 100%;
+            max-width: 90vw;
+            background-color: #f5fff5;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 100, 0, 0.15);
+            overflow: hidden;
+            flex-direction: column;
+            height: 80vh;
+            display: flex;
+        }
+
+        .chat-header {
+            background: linear-gradient(90deg, #3ba55c, #1d7a3c);
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 10px rgba(0, 80, 0, 0.2);
+        }
+
+        .chat-header h1 {
+            margin: 0;
+            font-size: 1.6rem;
+        }
+
+        .chat-message {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background-color: #f0f9f2;
+            max-height: calc(90vh - 120px);
+            padding-bottom: 60px;
+        }
+
+        .message {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .message-content {
+            padding: 12px 15px;
+            border-radius: 15px;
+            max-width: 70%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 5px rgba(0, 80, 0, 0.15);
+        }
+
+        .user-message {
+            flex-direction: row-reverse;
+        }
+
+        .user-message .message-content {
+            background-color: #5fc67a;
+            color: white;
+            margin-right: 10px;
+        }
+
+        .bot-message .message-content {
+            background-color: #e1f3e3;
+            color: #1a3d1a;
+            margin-left: 10px;
+        }
+
+        .profile-image {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .chat-input-container {
+            display: flex;
+            padding: 15px;
+            background-color: #eaf6ec;
+            border-top: 1px solid #cce5d0;
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #8ccf9f;
+            border-radius: 6px;
+            font-size: 1rem;
+            background-color: #ffffff;
+            color: #1a3d1a;
+            outline: none;
+        }
+
+        #user-input::placeholder {
+            color: #7a9f7a;
+        }
+
+        #send-button {
+            padding: 10px 20px;
+            background-color: #3ba55c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        #send-button:hover {
+            background-color: #2f8b4d;
+            transform: scale(1.05);
+        }
+
+        #send-button:disabled {
+            background-color: #9ccba8;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 480px) {
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #e0f2e5;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #79c48c;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5fa870;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1> Krashi Mitr </h1>
+        </div>
+        <div class="chat-message" id="chat-message"></div>
+        <div class="chat-input-container">
+            <input type="text" id="user-input" placeholder="Ask about crops, soil, fertilizers...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG = {
+            API_KEY: 'AIzaSyA5lBs3awerUBmCH7D-vCdBsA_Ugzfewmk', // ⚠️ Replace with your Gemini API key
+            API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+        };
+
+        const chatMessages = document.getElementById('chat-message');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+
+        async function generateResponse(prompt) {
+            const response = await fetch(`${CONFIG.API_URL}?key=${CONFIG.API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    systemInstruction: {
+                        role: "system",
+                        parts: [{
+                            text: "You are a helpful AI Agriculture Assistant. Always answer questions related to farming, soil, crops, irrigation, fertilizers, pest management, and weather. Provide simple, practical, and easy-to-understand solutions for Indian farmers."
+                        }]
+                    },
+                    contents: [{ role: "user", parts: [{ text: prompt }] }]
+                })
+            });
+
+            if (!response.ok) throw new Error('API request failed');
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        function cleanMarkdown(text) {
+            return text.replace(/#{1,6}\s?/g, '')
+                .replace(/\*\*/g, '')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+        }
+
+        function addMessage(message, isUser) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', isUser ? 'user-message' : 'bot-message');
+
+            const profileImage = document.createElement('img');
+            profileImage.classList.add('profile-image');
+            profileImage.src = isUser ? 'user.jpg' : 'bot.jpg';
+            profileImage.alt = isUser ? 'User' : 'Bot';
+
+            const messageContent = document.createElement('div');
+            messageContent.classList.add('message-content');
+            messageContent.textContent = message;
+
+            messageElement.appendChild(profileImage);
+            messageElement.appendChild(messageContent);
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function streamText(text, callback) {
+            for (let i = 0; i < text.length; i++) {
+                callback(text.slice(0, i + 1));
+                await new Promise(res => setTimeout(res, 25));
+            }
+        }
+
+        async function handleUserInput() {
+            const userMessage = userInput.value.trim();
+            if (!userMessage) return;
+
+            addMessage(userMessage, true);
+            userInput.value = '';
+            sendButton.disabled = true;
+            userInput.disabled = true;
+
+            try {
+                const botRaw = await generateResponse(userMessage);
+                const cleanedBot = cleanMarkdown(botRaw);
+                addMessage('', false);
+                const lastMsgBubble = chatMessages.lastElementChild.querySelector('.message-content');
+                await streamText(cleanedBot, (chunk) => {
+                    lastMsgBubble.textContent = chunk;
+                });
+            } catch (error) {
+                console.error(error);
+                addMessage('Sorry, I am unable to respond right now. Please try later.', false);
+            } finally {
+                sendButton.disabled = false;
+                userInput.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        sendButton.addEventListener('click', handleUserInput);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleUserInput();
+            }
+        });
+
+        window.addEventListener('load', () => {
+            addMessage("👩‍🌾 Namaste! I’m your Smart Agriculture Assistant. How can I help you today — crop advice, soil improvement, pest control, or fertilizer tips?", false);
+        });
+    </script>
+</body>
+
+</html>
+</div>
+
+
+{% endblock %}
